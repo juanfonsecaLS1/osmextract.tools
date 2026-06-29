@@ -1,0 +1,19 @@
+Package: osmextract.tools
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.0.9000
+Authors@R: 
+    person("Juan P.", "Fonseca-Zamora", , "ts18jpf@leeds.ac.uk", role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0006-7042-3828"))
+Description: What the package does (one paragraph).
+License: MIT + file LICENSE
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 8.0.0
+Imports: 
+    dplyr (>= 1.2.1),
+    osmextract (>= 0.6.0),
+    sf (>= 1.1.1),
+    sfnetworks (>= 0.6.6)
