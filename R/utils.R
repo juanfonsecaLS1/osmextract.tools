@@ -1,3 +1,5 @@
+#' @importFrom rlang .data
+
 tidy_highway <- function(net, highway_filter) {
   net$highway <- gsub(
     pattern = "_link",

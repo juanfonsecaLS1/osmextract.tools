@@ -34,6 +34,8 @@ oe_get_sfnetwork <- function(
     "residential"
   )
 ) {
+  checkmate::assert_logical(directed, len = 1)
+
   net <- get_tidynetwork(
     ...,
     simplify_highway = simplify_highway,
@@ -73,9 +75,9 @@ net_2_sfnet_undirected <- function(net_sf) {
 }
 
 prepare_directed <- function(sfnet_und) {
-  net_raw <- sfnetworks::activate(sfnet_und, "edges") %>%
-    dplyr::as_tibble() %>%
-    dplyr::select(-from, -to, z_order)
+  net_raw <- sfnetworks::activate(sfnet_und, "edges") |>
+    dplyr::as_tibble() |>
+    dplyr::select(-.data$from, -.data$to, -.data$z_order)
 
   # Reversing the geometries of bidirectional links
   net_rev <- sf::st_reverse(net_raw[net_raw$oneway == "no", ])
@@ -91,16 +93,21 @@ prepare_directed <- function(sfnet_und) {
 #' @param simplify_highway logical, whether to simplify the highway values by removing the "_link" suffix and filtering by `highway_filter`
 #' @param highway_filter character vector of highway types to keep, if `simplify_highway` is TRUE
 #'
-#' @returns
+#' @returns sf object with standardized highway and oneway values
 #'
 #' @export
 #' @examples
+#' \dontrun{
+#' my_area <- sf::st_point(c(-1.6005470549372385,53.836053590512215)) |>
+#'   sf::st_sfc(crs = 4326) |>
+#'  sf::st_buffer(units::set_units(1, "km"))
+#' tidynet_sf <- get_tidynetwork(place = my_area, mode = "driving")
+#' }
 get_tidynetwork <- function(
   ...,
   simplify_highway = TRUE,
   highway_filter
 ) {
-  checkmate::assert_logical(directed, len = 1)
   checkmate::assert_logical(simplify_highway, len = 1)
 
   args <- list(...)
