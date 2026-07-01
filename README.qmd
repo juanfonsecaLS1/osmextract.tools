@@ -1,0 +1,77 @@
+---
+format: gfm
+---
+
+<!-- README.md is generated from README.qmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# osmextract.tools
+
+<!-- badges: start -->
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+<!-- [![CRAN status](https://www.r-pkg.org/badges/version/osmextract.tools)](https://CRAN.R-project.org/package=osmextract.tools) -->
+<!-- badges: end -->
+
+The goal of osmextract.tools is to provide additional functionalities for the data obtained with `osmextract`.
+
+:::{.callout-warning}
+This package is under active development and may change without notice.
+:::
+
+## Installation
+
+You can install the development version of osmextract.tools from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("pak")
+pak::pak("juanfonsecaLS1/osmextract.tools")
+```
+
+## Example
+
+A common use of OSM data is to prepare routable networks. The following example shows how to use `osmextract.tools` to prepare a routable network from OSM data.
+
+The following code will download OSM data for a given area, extract the road network, and return a `sfnetwork` object representing a directed graph.
+
+```{r} 
+#| label: example
+#| eval: false
+
+library(osmextract.tools)
+library(sf)
+
+## basic example code
+
+my_area <- sf::st_point(c(-1.5584637048901326, 53.80817188808102)) |>
+  sf::st_sfc(crs = 4326) |>
+  sf::st_buffer(units::set_units(1, "km"))
+
+sfnet <- oe_get_sfnetwork(my_area, "driving", directed = TRUE)
+```
+
+```{r}
+#| label: example1-code
+#| echo: false
+
+devtools::load_all()
+
+my_area <- sf::st_point(c(-1.5584637048901326, 53.80817188808102)) |>
+  sf::st_sfc(crs = 4326) |>
+  sf::st_buffer(units::set_units(1, "km"))
+
+sfnet <- oe_get_sfnetwork(my_area, "driving", directed = TRUE)
+```
+
+A quick visualisation
+```{r}
+#| label: example1-plot
+plot(sfnet)
+```
