@@ -29,17 +29,18 @@ tidy_highway <- function(net, highway_filter) {
 #'
 #' @examples
 #' \dontrun{
-#' my_area <- sf::st_point(c(-1.60054,53.83605)) |>
-#'   sf::st_sfc(crs = 4326) |>
-#'   sf::st_buffer(units::set_units(1, "km"))
-#' sf_net <- oe_get_network(place = my_area, mode = "driving")
+#' sf_net <- osmextract::oe_get_network(place = "ITS Leeds", mode = "driving")
 #' sf_net_tidy <- tidy_oneway(sf_net, implied_oneway = TRUE)
 #' }
 tidy_oneway <- function(
   net_raw,
   implied_oneway = TRUE
 ) {
-  checkmate::assert_logical(implied_oneway)
+  if (!is.logical(implied_oneway)) {
+    stop(
+      "The implied_oneway parameter must be a logical value (TRUE or FALSE)."
+    )
+  }
 
   # Simplifying the bi-directional tags
   net_raw$oneway[
@@ -71,4 +72,30 @@ tidy_oneway <- function(
 # Function for summarise attributes of edges when converting to sfnetwork
 collapse_function <- function(x) {
   paste(unique(x), collapse = ",")
+}
+
+check_highway_filter <- function(highway_filter) {
+  match.arg(
+    highway_filter,
+    c(
+      "busway",
+      "cycleway",
+      "footway",
+      "living_street",
+      "motorway",
+      "path",
+      "pedestrian",
+      "primary",
+      "residential",
+      "rest_area",
+      "service",
+      "services",
+      "steps",
+      "tertiary",
+      "track",
+      "trunk",
+      "unclassified"
+    ),
+    several.ok = TRUE
+  )
 }

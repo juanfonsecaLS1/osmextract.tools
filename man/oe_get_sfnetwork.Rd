@@ -31,11 +31,6 @@ create a tidy sfnetwork object. All unique merged edge attributes are concatenat
 It also allows for the creation of directed or undirected networks.
 }
 \examples{
-\dontrun{
-my_area <- sf::st_point(c(-1.60054,53.83605)) |>
-  sf::st_sfc(crs = 4326) |>
-  sf::st_buffer(units::set_units(1, "km"))
-
 highway_filter = c(
  "motorway",
  "trunk",
@@ -47,25 +42,25 @@ highway_filter = c(
 )
 
 # sfnet directed unfiltered
-oe_get_sfnetwork(
-  place = my_area,
+car_sfnet <- oe_get_sfnetwork(
+  place = "ITS Leeds",
   mode = "driving",
   directed = TRUE
 )
+plot(car_sfnet)
 # sfnet directed filtered
-oe_get_sfnetwork(
-  place = my_area,
+car_sfnet_filtered <- oe_get_sfnetwork(
+  place = "ITS Leeds",
   mode = "driving",
   directed = TRUE,
   highway_filter = highway_filter
 )
 
 # sfnet_undirected filtered
-oe_get_sfnetwork(
-  place = my_area,
-  mode = "driving",
-  directed = FALSE,
-  highway_filter = highway_filter
+walk_sfnet <- oe_get_sfnetwork(
+  place = "ITS Leeds",
+  mode = "walking"
 )
-}
+plot(walk_sfnet)
+
 }

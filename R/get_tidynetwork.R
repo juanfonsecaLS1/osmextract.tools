@@ -16,11 +16,6 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' my_area <- sf::st_point(c(-1.60054,53.83605)) |>
-#'   sf::st_sfc(crs = 4326) |>
-#'   sf::st_buffer(units::set_units(1, "km"))
-#'
 #' highway_filter = c(
 #'  "motorway",
 #'  "trunk",
@@ -32,27 +27,27 @@
 #')
 #'
 #' # sfnet directed unfiltered
-#' oe_get_sfnetwork(
-#'   place = my_area,
+#' car_sfnet <- oe_get_sfnetwork(
+#'   place = "ITS Leeds",
 #'   mode = "driving",
 #'   directed = TRUE
 #' )
+#' plot(car_sfnet)
 #' # sfnet directed filtered
-#' oe_get_sfnetwork(
-#'   place = my_area,
+#' car_sfnet_filtered <- oe_get_sfnetwork(
+#'   place = "ITS Leeds",
 #'   mode = "driving",
 #'   directed = TRUE,
 #'   highway_filter = highway_filter
 #' )
 #'
 #' # sfnet_undirected filtered
-#' oe_get_sfnetwork(
-#'   place = my_area,
-#'   mode = "driving",
-#'   directed = FALSE,
-#'   highway_filter = highway_filter
+#' walk_sfnet <- oe_get_sfnetwork(
+#'   place = "ITS Leeds",
+#'   mode = "walking"
 #' )
-#' }
+#' plot(walk_sfnet)
+#'
 
 oe_get_sfnetwork <- function(
   ...,
@@ -60,7 +55,20 @@ oe_get_sfnetwork <- function(
   simplify_highway = TRUE,
   highway_filter = NULL
 ) {
-  checkmate::assert_logical(directed, len = 1)
+  rlang::check_installed(
+    c("sfnetworks", "tidygraph"),
+    reason = "to use the `oe_get_sfnetwork()` function."
+  )
+
+  if (!is.null(highway_filter)) {
+    check_highway_filter(highway_filter)
+  }
+
+  if (!is.logical(directed) && length(directed) != 1) {
+    stop(
+      "The directed parameter must be a logical value (TRUE or FALSE)."
+    )
+  }
 
   net <- oe_get_tidynetwork(
     ...,
@@ -88,15 +96,10 @@ oe_get_sfnetwork <- function(
 #'
 #' @examples
 #' \dontrun{
-#' my_area <- sf::st_point(c(-1.60054,53.83605)) |>
-#'  sf::st_sfc(crs = 4326) |>
-#'  sf::st_buffer(units::set_units(1, "km"))
-#'
-#' net_sf <- get_tidynetwork(place = my_area, mode = "driving")
+#' net_sf <- oe_get_tidynetwork(place = "ITS Leeds", mode = "driving")
 #'
 #' sfnet_undirected <- net_2_sfnet_undirected(net_sf)
 #' }
-#'
 net_2_sfnet_undirected <- function(net_sf) {
   sfnet <- sfnetworks::as_sfnetwork(
     x = net_sf,
@@ -142,10 +145,6 @@ prepare_directed <- function(sfnet_und) {
 #'
 #' @export
 #' @examples
-#' \dontrun{
-#' my_area <- sf::st_point(c(-1.60054,53.83605)) |>
-#'   sf::st_sfc(crs = 4326) |>
-#'   sf::st_buffer(units::set_units(1, "km"))
 #'
 #' highway_filter = c(
 #'  "motorway",
@@ -157,27 +156,39 @@ prepare_directed <- function(sfnet_und) {
 #'  "residential"
 #' )
 #'
-#' tidynet_sf <- get_tidynetwork(place = my_area, mode = "driving")
+#' tidynet_sf <- oe_get_tidynetwork(place = "ITS Leeds", mode = "driving")
+#' print(tidynet_sf)
 #'
-#' tidynet_sf_filtered <- get_tidynetwork(
-#'   place = my_area,
+#' tidynet_sf_filtered <- oe_get_tidynetwork(
+#'   place = "ITS Leeds",
 #'   mode = "driving",
 #'   highway_filter = highway_filter
 #' )
-#' }
+#' print(tidynet_sf_filtered)
+#'
 oe_get_tidynetwork <- function(
   ...,
   simplify_highway = TRUE,
   highway_filter = NULL
 ) {
-  checkmate::assert_logical(simplify_highway, len = 1)
+  if (!is.logical(simplify_highway) && length(simplify_highway) != 1) {
+    stop(
+      "The simplify_highway parameter must be a logical value (TRUE or FALSE)."
+    )
+  }
+
+  if (!is.null(highway_filter)) {
+    check_highway_filter(highway_filter)
+  }
 
   args <- list(...)
 
+  min_tags <- c("oneway", "junction")
+
   if ("extra_tags" %in% names(args)) {
-    args$extra_tags <- c(args$extra_tags, "junction")
+    args$extra_tags <- c(args$extra_tags, min_tags)
   } else {
-    args$extra_tags <- "junction"
+    args$extra_tags <- min_tags
   }
 
   # Get network
@@ -212,10 +223,6 @@ oe_get_tidynetwork <- function(
 #'
 #' @export
 #' @examples
-#' \dontrun{
-#'  my_area <- sf::st_point(c(-1.60054, 53.83605)) |>
-#'    sf::st_sfc(crs = 4326) |>
-#'    sf::st_buffer(units::set_units(1, "km"))
 #'  highway_filter = c(
 #'  "motorway",
 #'  "trunk",
@@ -226,26 +233,36 @@ oe_get_tidynetwork <- function(
 #'  "residential"
 #' )
 #'
-#'  oe_get_dodgrnetwork(
-#'    place = my_area,
+#'  graph_car <- oe_get_dodgrnetwork(
+#'    place = "ITS Leeds",
 #'    mode = "driving",
 #'    wt_profile = "motorcar",
 #'    left_side = TRUE
 #'  )
 #'
-#'  oe_get_dodgrnetwork(
-#'    place = my_area,
-#'    mode = "driving",
-#'    wt_profile = "motorcar",
+#'  class(graph_car)
+#'
+#'  graph_bike <- oe_get_dodgrnetwork(
+#'    place = "ITS Leeds",
+#'    mode = "cycling",
+#'    wt_profile = "bicycle",
 #'    left_side = TRUE,
 #'    highway_filter = highway_filter
 #'  )
-#' }
 #'
 oe_get_dodgrnetwork <- function(
   ...,
   highway_filter = NULL
 ) {
+  rlang::check_installed(
+    c("sfnetworks", "tidygraph"),
+    reason = "to use the `oe_get_sfnetwork()` function."
+  )
+
+  if (!is.null(highway_filter)) {
+    check_highway_filter(highway_filter)
+  }
+
   # Extract the dots arguments as alist
   all.args <- list(...)
 

@@ -20,10 +20,6 @@ a \code{sf} object with standardised highway and oneway values
 Obtain a tidy sf from OpenStreetMap data
 }
 \examples{
-\dontrun{
-my_area <- sf::st_point(c(-1.60054,53.83605)) |>
-  sf::st_sfc(crs = 4326) |>
-  sf::st_buffer(units::set_units(1, "km"))
 
 highway_filter = c(
  "motorway",
@@ -35,12 +31,14 @@ highway_filter = c(
  "residential"
 )
 
-tidynet_sf <- get_tidynetwork(place = my_area, mode = "driving")
+tidynet_sf <- oe_get_tidynetwork(place = "ITS Leeds", mode = "driving")
+print(tidynet_sf)
 
-tidynet_sf_filtered <- get_tidynetwork(
-  place = my_area,
+tidynet_sf_filtered <- oe_get_tidynetwork(
+  place = "ITS Leeds",
   mode = "driving",
   highway_filter = highway_filter
 )
-}
+print(tidynet_sf_filtered)
+
 }

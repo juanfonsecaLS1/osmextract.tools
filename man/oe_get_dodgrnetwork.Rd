@@ -19,10 +19,6 @@ This function is a wrapper around \code{osmextract::oe_get_network()}
 that returns a \verb{dodgr_streetnet`` object. It performs simplification of the highway values, filters by highway types and standardises the }oneway\verb{attribute as well as applying the implied oneway restriction based on the}junction`` tag values.
 }
 \examples{
-\dontrun{
- my_area <- sf::st_point(c(-1.60054, 53.83605)) |>
-   sf::st_sfc(crs = 4326) |>
-   sf::st_buffer(units::set_units(1, "km"))
  highway_filter = c(
  "motorway",
  "trunk",
@@ -33,20 +29,21 @@ that returns a \verb{dodgr_streetnet`` object. It performs simplification of the
  "residential"
 )
 
- oe_get_dodgrnetwork(
-   place = my_area,
+ graph_car <- oe_get_dodgrnetwork(
+   place = "ITS Leeds",
    mode = "driving",
    wt_profile = "motorcar",
    left_side = TRUE
  )
 
- oe_get_dodgrnetwork(
-   place = my_area,
-   mode = "driving",
-   wt_profile = "motorcar",
+ class(graph_car)
+
+ graph_bike <- oe_get_dodgrnetwork(
+   place = "ITS Leeds",
+   mode = "cycling",
+   wt_profile = "bicycle",
    left_side = TRUE,
    highway_filter = highway_filter
  )
-}
 
 }

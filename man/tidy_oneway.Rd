@@ -24,10 +24,7 @@ For more information on the implied oneway restriction, see \href{https://wiki.o
 }
 \examples{
 \dontrun{
-my_area <- sf::st_point(c(-1.60054,53.83605)) |>
-  sf::st_sfc(crs = 4326) |>
-  sf::st_buffer(units::set_units(1, "km"))
-sf_net <- oe_get_network(place = my_area, mode = "driving")
+sf_net <- osmextract::oe_get_network(place = "ITS Leeds", mode = "driving")
 sf_net_tidy <- tidy_oneway(sf_net, implied_oneway = TRUE)
 }
 }
