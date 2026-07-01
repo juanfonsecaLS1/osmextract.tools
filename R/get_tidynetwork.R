@@ -150,3 +150,66 @@ oe_get_tidynetwork <- function(
 
   net
 }
+
+
+#' Obtain a weighted_streetnet from OpenStreetMap data
+#'
+#' This function is a wrapper around `osmextract::oe_get_network()`
+#' that returns a `dodgr_streetnet`` object. It performs
+#' simplification of the highway values, filters by highway types and
+#' standardises the `oneway` attribute as well as applying the
+#' implied oneway restriction based on the `junction`` tag values.
+#'
+#'
+#'
+#' @param ... parameters passed to `osmextract::oe_get_network()` and `dodgr::weight_streetnet()`, excluding `x` and `id_col` for the latter.
+#' @param highway_filter string vector of highway types to keep. By default, it includes "motorway", "trunk", "primary", "secondary", "tertiary", "unclassified", and "residential".
+#'
+#' @returns a `dodgr_streetnet` object
+#'
+#' @export
+#' @examples
+#' \dontrun{
+#'  my_area <- sf::st_point(c(-1.6005470549372385, 53.836053590512215)) |>
+#'    sf::st_sfc(crs = 4326) |>
+#'    sf::st_buffer(units::set_units(1, "km"))
+#'  dodgr_graph <- oe_get_dodgrnetwork(
+#'    place = my_area,
+#'    mode = "driving",
+#'    wt_profile = "motorcar",
+#'    left_side = TRUE
+#'  )
+#' }
+#'
+oe_get_dodgrnetwork <- function(
+  ...,
+  highway_filter = c(
+    "motorway",
+    "trunk",
+    "primary",
+    "secondary",
+    "tertiary",
+    "unclassified",
+    "residential"
+  )
+) {
+  # Extract the dots arguments as alist
+  current.args <- list(...)
+
+  # Identifying the names of the parameters for the dodgr function
+  dodgr.pars <- names(formals(dodgr::weight_streetnet))
+  dodgr.pars <- dodgr.pars[!dodgr.pars %in% c("x", "id_col")]
+
+  # Get a subset of the current.args that are not in dodgr.pars
+  current.args <- current.args[!names(current.args) %in% c(dodgr.pars)]
+
+  # Calling the oe_get_tidynetwork function with the filtered arguments
+  net <- do.call(oe_get_tidynetwork, current.args)
+
+  # Calling the dodgr::weight_streetnet function with the net and the remaining arguments
+  dodgr_args <- list(x = net)
+  dodgr_args <- c(dodgr_args, current.args[names(current.args) %in% dodgr.pars])
+
+  # Returning the weighted_streetnetwork
+  do.call(dodgr::weight_streetnet, dodgr_args)
+}

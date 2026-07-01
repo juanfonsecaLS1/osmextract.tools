@@ -10,6 +10,7 @@ Depends:
     R (>= 4.1.0)
 Imports: 
     checkmate (>= 2.3.4),
+    dodgr (>= 0.4.3),
     dplyr (>= 1.2.1),
     osmextract (>= 0.6.0),
     rlang (>= 1.2.0),
