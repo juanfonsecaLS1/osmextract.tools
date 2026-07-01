@@ -22,3 +22,12 @@ tag values if specified.
 \details{
 See \href{https://wiki.openstreetmap.org/wiki/Key:oneway#Implied_oneway_restriction}{oneway tag Wiki}.
 }
+\examples{
+\dontrun{
+my_area <- sf::st_point(c(-1.6005470549372385,53.836053590512215)) |>
+  sf::st_sfc(crs = 4326) |>
+ sf::st_buffer(units::set_units(1, "km"))
+sf_net <- oe_get_network(place = my_area, mode = "driving")
+sf_net_tidy <- tidy_oneway(sf_net, implied_oneway = TRUE)
+}
+}

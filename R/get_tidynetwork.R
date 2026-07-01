@@ -42,7 +42,7 @@ oe_get_sfnetwork <- function(
 ) {
   checkmate::assert_logical(directed, len = 1)
 
-  net <- get_tidynetwork(
+  net <- oe_get_tidynetwork(
     ...,
     simplify_highway = simplify_highway,
     highway_filter = highway_filter
@@ -122,10 +122,10 @@ prepare_directed <- function(sfnet_und) {
 #'  sf::st_buffer(units::set_units(1, "km"))
 #' tidynet_sf <- get_tidynetwork(place = my_area, mode = "driving")
 #' }
-get_tidynetwork <- function(
+oe_get_tidynetwork <- function(
   ...,
   simplify_highway = TRUE,
-  highway_filter
+  highway_filter = NULL
 ) {
   checkmate::assert_logical(simplify_highway, len = 1)
 
