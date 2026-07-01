@@ -22,10 +22,14 @@ oe_get_sfnetwork(
 \item{highway_filter}{character vector of highway types to keep, if \code{simplify_highway} is TRUE}
 }
 \value{
-a sfnetwork object
+a \code{sfnetwork} object
 }
 \description{
-Obtain a sfnetwork object from OpenStreetMap data
+This function is a wrapper around \code{osmextract::oe_get_network()} that returns a sfnetwork object.
+It performs simplification of the highway values and filters by highway types if specified. Minimal
+network preprocessing tasks i.e. subdivision and smoothing are performed using \code{sfnetworks} to
+create a tidy sfnetwork object. All unique merged edge attributes are concatenated.
+It also allows for the creation of directed or undirected networks.
 }
 \examples{
 \dontrun{

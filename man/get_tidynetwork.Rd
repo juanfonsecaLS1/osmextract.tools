@@ -14,7 +14,7 @@ get_tidynetwork(..., simplify_highway = TRUE, highway_filter)
 \item{highway_filter}{character vector of highway types to keep, if \code{simplify_highway} is TRUE}
 }
 \value{
-sf object with standardized highway and oneway values
+a \code{sf} object with standardised highway and oneway values
 }
 \description{
 Obtain a tidy sf from OpenStreetMap data

@@ -1,11 +1,17 @@
 #' Obtain a sfnetwork object from OpenStreetMap data
 #'
+#' This function is a wrapper around `osmextract::oe_get_network()` that returns a sfnetwork object.
+#' It performs simplification of the highway values and filters by highway types if specified. Minimal
+#' network preprocessing tasks i.e. subdivision and smoothing are performed using `sfnetworks` to
+#' create a tidy sfnetwork object. All unique merged edge attributes are concatenated.
+#' It also allows for the creation of directed or undirected networks.
+#'
 #' @param ... parameters passed to `osmextract::oe_get_network()`
 #' @param simplify_highway logical, whether to simplify the highway values by removing the "_link" suffix and filtering by `highway_filter`
 #' @param highway_filter character vector of highway types to keep, if `simplify_highway` is TRUE
 #' @param directed logical, whether to return a directed sfnetwork object (default is FALSE)
 #'
-#' @returns a sfnetwork object
+#' @returns a `sfnetwork` object
 #'
 #' @export
 #'
@@ -53,6 +59,21 @@ oe_get_sfnetwork <- function(
   net
 }
 
+#' Convert a spatial network to an undirected sfnetwork
+#'
+#' @param net_sf a `sf` object representing a spatial network
+#'
+#' @returns a `sfnetwork` object
+#'
+#' @examples
+#' \dontrun{
+#' my_area <- sf::st_point(c(-1.6005470549372385,53.836053590512215)) |>
+#'  sf::st_sfc(crs = 4326) |>
+#' sf::st_buffer(units::set_units(1, "km"))
+#' net_sf <- get_tidynetwork(place = my_area, mode = "driving")
+#' sfnet_undirected <- net_2_sfnet_undirected(net_sf)
+#' }
+#'
 net_2_sfnet_undirected <- function(net_sf) {
   sfnet <- sfnetworks::as_sfnetwork(
     x = net_sf,
@@ -89,11 +110,9 @@ prepare_directed <- function(sfnet_und) {
 
 #' Obtain a tidy sf from OpenStreetMap data
 #'
-#' @param ... parameters passed to `osmextract::oe_get_network()`
-#' @param simplify_highway logical, whether to simplify the highway values by removing the "_link" suffix and filtering by `highway_filter`
-#' @param highway_filter character vector of highway types to keep, if `simplify_highway` is TRUE
+#' @inheritParams oe_get_sfnetwork
 #'
-#' @returns sf object with standardized highway and oneway values
+#' @returns a `sf` object with standardised highway and oneway values
 #'
 #' @export
 #' @examples

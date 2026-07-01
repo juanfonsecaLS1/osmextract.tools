@@ -2,4 +2,5 @@
 
 export(get_tidynetwork)
 export(oe_get_sfnetwork)
+export(tidy_oneway)
 importFrom(rlang,.data)
