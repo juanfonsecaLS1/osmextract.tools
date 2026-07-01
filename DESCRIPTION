@@ -1,10 +1,10 @@
 Package: osmextract.tools
-Title: What the Package Does (One Line, Title Case)
+Title: Process osm data obtained with `osmextract`
 Version: 0.0.0.9000
 Authors@R: 
     person("Juan P.", "Fonseca-Zamora", , "ts18jpf@leeds.ac.uk", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0006-7042-3828"))
-Description: What the package does (one paragraph).
+Description: A set of tools for processing osm data obtained with `osmextract`.
 License: GPL (>= 3)
 Depends: 
     R (>= 4.1.0)
