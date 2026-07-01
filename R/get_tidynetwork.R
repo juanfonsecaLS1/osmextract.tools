@@ -17,28 +17,48 @@
 #'
 #' @examples
 #' \dontrun{
-#' my_area <- sf::st_point(c(-1.6005470549372385,53.836053590512215)) |>
+#' my_area <- sf::st_point(c(-1.60054,53.83605)) |>
 #'   sf::st_sfc(crs = 4326) |>
 #'   sf::st_buffer(units::set_units(1, "km"))
 #'
-#' sfnet_directed <- oe_get_sfnetwork(place = my_area, mode = "driving", directed = TRUE)
+#' highway_filter = c(
+#'  "motorway",
+#'  "trunk",
+#'  "primary",
+#'  "secondary",
+#'  "tertiary",
+#'  "unclassified",
+#'  "residential"
+#')
 #'
-#' sfnet_undirected <- oe_get_sfnetwork(place = my_area, mode = "driving", directed = FALSE)
+#' # sfnet directed unfiltered
+#' oe_get_sfnetwork(
+#'   place = my_area,
+#'   mode = "driving",
+#'   directed = TRUE
+#' )
+#' # sfnet directed filtered
+#' oe_get_sfnetwork(
+#'   place = my_area,
+#'   mode = "driving",
+#'   directed = TRUE,
+#'   highway_filter = highway_filter
+#' )
+#'
+#' # sfnet_undirected filtered
+#' oe_get_sfnetwork(
+#'   place = my_area,
+#'   mode = "driving",
+#'   directed = FALSE,
+#'   highway_filter = highway_filter
+#' )
 #' }
 
 oe_get_sfnetwork <- function(
   ...,
   directed = FALSE,
   simplify_highway = TRUE,
-  highway_filter = c(
-    "motorway",
-    "trunk",
-    "primary",
-    "secondary",
-    "tertiary",
-    "unclassified",
-    "residential"
-  )
+  highway_filter = NULL
 ) {
   checkmate::assert_logical(directed, len = 1)
 
@@ -49,6 +69,7 @@ oe_get_sfnetwork <- function(
   )
 
   # Basic simplification using sfnetworks with the undirected graph
+  message("Starting basic network simplification...")
   net <- net_2_sfnet_undirected(net)
 
   if (directed) {
@@ -67,10 +88,12 @@ oe_get_sfnetwork <- function(
 #'
 #' @examples
 #' \dontrun{
-#' my_area <- sf::st_point(c(-1.6005470549372385,53.836053590512215)) |>
+#' my_area <- sf::st_point(c(-1.60054,53.83605)) |>
 #'  sf::st_sfc(crs = 4326) |>
-#' sf::st_buffer(units::set_units(1, "km"))
+#'  sf::st_buffer(units::set_units(1, "km"))
+#'
 #' net_sf <- get_tidynetwork(place = my_area, mode = "driving")
+#'
 #' sfnet_undirected <- net_2_sfnet_undirected(net_sf)
 #' }
 #'
@@ -97,14 +120,17 @@ net_2_sfnet_undirected <- function(net_sf) {
 
 prepare_directed <- function(sfnet_und) {
   net_raw <- sfnetworks::activate(sfnet_und, "edges") |>
-    dplyr::as_tibble() |>
-    dplyr::select(-.data$from, -.data$to, -.data$z_order)
+    sf::st_as_sf()
+
+  net_raw$from <- NULL
+  net_raw$to <- NULL
+  net_raw$z_order <- NULL
 
   # Reversing the geometries of bidirectional links
   net_rev <- sf::st_reverse(net_raw[net_raw$oneway == "no", ])
 
   # Binding the duplicated geometries
-  dplyr::bind_rows(net_rev, net_raw) |>
+  rbind(net_rev, net_raw) |>
     sfnetworks::as_sfnetwork(directed = TRUE)
 }
 
@@ -117,10 +143,27 @@ prepare_directed <- function(sfnet_und) {
 #' @export
 #' @examples
 #' \dontrun{
-#' my_area <- sf::st_point(c(-1.6005470549372385,53.836053590512215)) |>
+#' my_area <- sf::st_point(c(-1.60054,53.83605)) |>
 #'   sf::st_sfc(crs = 4326) |>
-#'  sf::st_buffer(units::set_units(1, "km"))
+#'   sf::st_buffer(units::set_units(1, "km"))
+#'
+#' highway_filter = c(
+#'  "motorway",
+#'  "trunk",
+#'  "primary",
+#'  "secondary",
+#'  "tertiary",
+#'  "unclassified",
+#'  "residential"
+#' )
+#'
 #' tidynet_sf <- get_tidynetwork(place = my_area, mode = "driving")
+#'
+#' tidynet_sf_filtered <- get_tidynetwork(
+#'   place = my_area,
+#'   mode = "driving",
+#'   highway_filter = highway_filter
+#' )
 #' }
 oe_get_tidynetwork <- function(
   ...,
@@ -170,45 +213,59 @@ oe_get_tidynetwork <- function(
 #' @export
 #' @examples
 #' \dontrun{
-#'  my_area <- sf::st_point(c(-1.6005470549372385, 53.836053590512215)) |>
+#'  my_area <- sf::st_point(c(-1.60054, 53.83605)) |>
 #'    sf::st_sfc(crs = 4326) |>
 #'    sf::st_buffer(units::set_units(1, "km"))
-#'  dodgr_graph <- oe_get_dodgrnetwork(
+#'  highway_filter = c(
+#'  "motorway",
+#'  "trunk",
+#'  "primary",
+#'  "secondary",
+#'  "tertiary",
+#'  "unclassified",
+#'  "residential"
+#' )
+#'
+#'  oe_get_dodgrnetwork(
 #'    place = my_area,
 #'    mode = "driving",
 #'    wt_profile = "motorcar",
 #'    left_side = TRUE
 #'  )
+#'
+#'  oe_get_dodgrnetwork(
+#'    place = my_area,
+#'    mode = "driving",
+#'    wt_profile = "motorcar",
+#'    left_side = TRUE,
+#'    highway_filter = highway_filter
+#'  )
 #' }
 #'
 oe_get_dodgrnetwork <- function(
   ...,
-  highway_filter = c(
-    "motorway",
-    "trunk",
-    "primary",
-    "secondary",
-    "tertiary",
-    "unclassified",
-    "residential"
-  )
+  highway_filter = NULL
 ) {
   # Extract the dots arguments as alist
-  current.args <- list(...)
+  all.args <- list(...)
 
   # Identifying the names of the parameters for the dodgr function
   dodgr.pars <- names(formals(dodgr::weight_streetnet))
   dodgr.pars <- dodgr.pars[!dodgr.pars %in% c("x", "id_col")]
 
-  # Get a subset of the current.args that are not in dodgr.pars
-  current.args <- current.args[!names(current.args) %in% c(dodgr.pars)]
+  # Get a subset of the all.args that are not in dodgr.pars
+  current.args <- all.args[!names(all.args) %in% c(dodgr.pars)]
+
+  # Compile the arguments for the oe_get_tidynetwork function, including the highway_filter
+  tidynet.args <- list(highway_filter = highway_filter)
+  tidynet.args <- c(current.args, tidynet.args)
 
   # Calling the oe_get_tidynetwork function with the filtered arguments
-  net <- do.call(oe_get_tidynetwork, current.args)
+  net <- do.call(oe_get_tidynetwork, tidynet.args)
 
   # Calling the dodgr::weight_streetnet function with the net and the remaining arguments
   dodgr_args <- list(x = net)
-  dodgr_args <- c(dodgr_args, current.args[names(current.args) %in% dodgr.pars])
+  dodgr_args <- c(dodgr_args, all.args[names(all.args) %in% dodgr.pars])
 
   # Returning the weighted_streetnetwork
   do.call(dodgr::weight_streetnet, dodgr_args)

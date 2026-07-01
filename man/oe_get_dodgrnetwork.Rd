@@ -4,11 +4,7 @@
 \alias{oe_get_dodgrnetwork}
 \title{Obtain a weighted_streetnet from OpenStreetMap data}
 \usage{
-oe_get_dodgrnetwork(
-  ...,
-  highway_filter = c("motorway", "trunk", "primary", "secondary", "tertiary",
-    "unclassified", "residential")
-)
+oe_get_dodgrnetwork(..., highway_filter = NULL)
 }
 \arguments{
 \item{...}{parameters passed to \code{osmextract::oe_get_network()} and \code{dodgr::weight_streetnet()}, excluding \code{x} and \code{id_col} for the latter.}
@@ -24,14 +20,32 @@ that returns a \verb{dodgr_streetnet`` object. It performs simplification of the
 }
 \examples{
 \dontrun{
- my_area <- sf::st_point(c(-1.6005470549372385, 53.836053590512215)) |>
+ my_area <- sf::st_point(c(-1.60054, 53.83605)) |>
    sf::st_sfc(crs = 4326) |>
    sf::st_buffer(units::set_units(1, "km"))
- dodgr_graph <- oe_get_dodgrnetwork(
+ highway_filter = c(
+ "motorway",
+ "trunk",
+ "primary",
+ "secondary",
+ "tertiary",
+ "unclassified",
+ "residential"
+)
+
+ oe_get_dodgrnetwork(
    place = my_area,
    mode = "driving",
    wt_profile = "motorcar",
    left_side = TRUE
+ )
+
+ oe_get_dodgrnetwork(
+   place = my_area,
+   mode = "driving",
+   wt_profile = "motorcar",
+   left_side = TRUE,
+   highway_filter = highway_filter
  )
 }
 

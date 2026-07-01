@@ -8,8 +8,7 @@ oe_get_sfnetwork(
   ...,
   directed = FALSE,
   simplify_highway = TRUE,
-  highway_filter = c("motorway", "trunk", "primary", "secondary", "tertiary",
-    "unclassified", "residential")
+  highway_filter = NULL
 )
 }
 \arguments{
@@ -33,12 +32,40 @@ It also allows for the creation of directed or undirected networks.
 }
 \examples{
 \dontrun{
-my_area <- sf::st_point(c(-1.6005470549372385,53.836053590512215)) |>
+my_area <- sf::st_point(c(-1.60054,53.83605)) |>
   sf::st_sfc(crs = 4326) |>
   sf::st_buffer(units::set_units(1, "km"))
 
-sfnet_directed <- oe_get_sfnetwork(place = my_area, mode = "driving", directed = TRUE)
+highway_filter = c(
+ "motorway",
+ "trunk",
+ "primary",
+ "secondary",
+ "tertiary",
+ "unclassified",
+ "residential"
+)
 
-sfnet_undirected <- oe_get_sfnetwork(place = my_area, mode = "driving", directed = FALSE)
+# sfnet directed unfiltered
+oe_get_sfnetwork(
+  place = my_area,
+  mode = "driving",
+  directed = TRUE
+)
+# sfnet directed filtered
+oe_get_sfnetwork(
+  place = my_area,
+  mode = "driving",
+  directed = TRUE,
+  highway_filter = highway_filter
+)
+
+# sfnet_undirected filtered
+oe_get_sfnetwork(
+  place = my_area,
+  mode = "driving",
+  directed = FALSE,
+  highway_filter = highway_filter
+)
 }
 }

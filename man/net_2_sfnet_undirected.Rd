@@ -17,10 +17,12 @@ Convert a spatial network to an undirected sfnetwork
 }
 \examples{
 \dontrun{
-my_area <- sf::st_point(c(-1.6005470549372385,53.836053590512215)) |>
+my_area <- sf::st_point(c(-1.60054,53.83605)) |>
  sf::st_sfc(crs = 4326) |>
-sf::st_buffer(units::set_units(1, "km"))
+ sf::st_buffer(units::set_units(1, "km"))
+
 net_sf <- get_tidynetwork(place = my_area, mode = "driving")
+
 sfnet_undirected <- net_2_sfnet_undirected(net_sf)
 }
 

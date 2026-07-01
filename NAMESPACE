@@ -3,5 +3,3 @@
 export(oe_get_dodgrnetwork)
 export(oe_get_sfnetwork)
 export(oe_get_tidynetwork)
-export(tidy_oneway)
-importFrom(rlang,.data)

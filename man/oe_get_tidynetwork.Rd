@@ -21,9 +21,26 @@ Obtain a tidy sf from OpenStreetMap data
 }
 \examples{
 \dontrun{
-my_area <- sf::st_point(c(-1.6005470549372385,53.836053590512215)) |>
+my_area <- sf::st_point(c(-1.60054,53.83605)) |>
   sf::st_sfc(crs = 4326) |>
- sf::st_buffer(units::set_units(1, "km"))
+  sf::st_buffer(units::set_units(1, "km"))
+
+highway_filter = c(
+ "motorway",
+ "trunk",
+ "primary",
+ "secondary",
+ "tertiary",
+ "unclassified",
+ "residential"
+)
+
 tidynet_sf <- get_tidynetwork(place = my_area, mode = "driving")
+
+tidynet_sf_filtered <- get_tidynetwork(
+  place = my_area,
+  mode = "driving",
+  highway_filter = highway_filter
+)
 }
 }

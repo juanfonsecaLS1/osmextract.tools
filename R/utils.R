@@ -1,5 +1,3 @@
-#' @importFrom rlang .data
-
 # This function simplifies the highway values by removing the "_link" suffix and filtering by `highway_filter` if specified.
 
 tidy_highway <- function(net, highway_filter) {
@@ -26,16 +24,14 @@ tidy_highway <- function(net, highway_filter) {
 #'
 #' @returns a `sf` object with standardised oneway values
 #'
-#' @export
-#'
-#' @details See [oneway tag Wiki](https://wiki.openstreetmap.org/wiki/Key:oneway#Implied_oneway_restriction).
+#' @details For more information on the implied oneway restriction, see [wiki.openstreetmap.org](https://wiki.openstreetmap.org/wiki/Key:oneway#Implied_oneway_restriction).
 #'
 #'
 #' @examples
 #' \dontrun{
-#' my_area <- sf::st_point(c(-1.6005470549372385,53.836053590512215)) |>
+#' my_area <- sf::st_point(c(-1.60054,53.83605)) |>
 #'   sf::st_sfc(crs = 4326) |>
-#'  sf::st_buffer(units::set_units(1, "km"))
+#'   sf::st_buffer(units::set_units(1, "km"))
 #' sf_net <- oe_get_network(place = my_area, mode = "driving")
 #' sf_net_tidy <- tidy_oneway(sf_net, implied_oneway = TRUE)
 #' }
@@ -72,7 +68,7 @@ tidy_oneway <- function(
   net_raw
 }
 
-
+# Function for summarise attributes of edges when converting to sfnetwork
 collapse_function <- function(x) {
   paste(unique(x), collapse = ",")
 }

@@ -20,13 +20,13 @@ It also applies the implied \code{oneway} tag restriction based on the \code{jun
 tag values if specified.
 }
 \details{
-See \href{https://wiki.openstreetmap.org/wiki/Key:oneway#Implied_oneway_restriction}{oneway tag Wiki}.
+For more information on the implied oneway restriction, see \href{https://wiki.openstreetmap.org/wiki/Key:oneway#Implied_oneway_restriction}{wiki.openstreetmap.org}.
 }
 \examples{
 \dontrun{
-my_area <- sf::st_point(c(-1.6005470549372385,53.836053590512215)) |>
+my_area <- sf::st_point(c(-1.60054,53.83605)) |>
   sf::st_sfc(crs = 4326) |>
- sf::st_buffer(units::set_units(1, "km"))
+  sf::st_buffer(units::set_units(1, "km"))
 sf_net <- oe_get_network(place = my_area, mode = "driving")
 sf_net_tidy <- tidy_oneway(sf_net, implied_oneway = TRUE)
 }
