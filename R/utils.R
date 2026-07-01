@@ -74,6 +74,7 @@ collapse_function <- function(x) {
   paste(unique(x), collapse = ",")
 }
 
+# function to ensure that the string values match the possible values for the highway_filter parameter
 check_highway_filter <- function(highway_filter) {
   match.arg(
     highway_filter,
